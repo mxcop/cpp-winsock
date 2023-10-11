@@ -16,14 +16,14 @@ cd ..
 if [%~1]==[run] if [%~2]==[server] (
     echo ~ Running Server...
     echo:
-    call server\bin\server.exe
+    call server\bin\server.exe %3 %4 %5
 )
 
 :: Run the executable if "run client" was specified
 if [%~1]==[run] if [%~2]==[client] (
     echo ~ Running Client...
     echo:
-    call client\bin\client.exe
+    call client\bin\client.exe %3 %4 %5
 )
 
 :: Gracefully exit

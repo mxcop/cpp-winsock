@@ -13,22 +13,28 @@
 
 void on_client_connect(SOCKET client);
 
-int main()
+int main(int argc, char *argv[])
 {
 	WSADATA wsa_data;
 	SOCKADDR_IN server_addr, client_addr;
+
+	const char* serve_port = "5555";
+	if(argc > 1)
+	{
+		serve_port = argv[1];
+	}
 
 	WSAStartup(MAKEWORD(2, 2), &wsa_data);
 	const auto server = socket(AF_INET, SOCK_STREAM, 0);
 
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(5555);
+	server_addr.sin_port = htons(atoi(serve_port));
 
 	::bind(server, reinterpret_cast<SOCKADDR *>(&server_addr), sizeof(server_addr));
 	listen(server, 0);
 
-	std::cout << "Listening for incoming connections..." << std::endl;
+	std::cout << "Listening for incoming connections at port " << serve_port << "..." << std::endl;
 
 	int client_addr_size = sizeof(client_addr);
 

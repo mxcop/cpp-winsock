@@ -15,11 +15,22 @@ extern "C" {
 
 int main(int argc, char *argv[])
 {
-	std::string buffer = "hello.";
-
+	const char* serve_addr = "127.0.0.1";
 	if(argc > 1)
 	{
-		buffer = argv[1];
+		serve_addr = argv[1];
+	}
+
+	const char* serve_port = "5555";
+	if(argc > 2)
+	{
+		serve_port = argv[2];
+	}
+
+	const char* buffer = "hello.";
+	if(argc > 3)
+	{
+		buffer = argv[3];
 	}
 
 	WSADATA wsa_data;
@@ -28,15 +39,23 @@ int main(int argc, char *argv[])
 	WSAStartup(MAKEWORD(2, 0), &wsa_data);
 	const auto server = socket(AF_INET, SOCK_STREAM, 0);
 
-	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr.s_addr);
+	inet_pton(AF_INET, serve_addr, &addr.sin_addr.s_addr);
 
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(5555);
+	addr.sin_port = htons(atoi(serve_port));
 
-	connect(server, reinterpret_cast<SOCKADDR *>(&addr), sizeof(addr));
+	int err = connect(server, reinterpret_cast<SOCKADDR *>(&addr), sizeof(addr));
+
+	if (err == -1) {
+		std::cout << "Failed to connect to server!" << std::endl;
+
+		closesocket(server);
+		WSACleanup();
+		return -1;
+	}
+
 	std::cout << "Connected to server!" << std::endl;
-
-	send(server, buffer.c_str(), buffer.length(), 0);
+	send(server, buffer, strlen(buffer) + 1, 0);
 	std::cout << "Message sent!" << std::endl;
 
 	closesocket(server);
